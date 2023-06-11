@@ -8,10 +8,10 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xpzouying/chatgptplugin/llm"
 	"github.com/xpzouying/chatgptplugin/openai"
 	"github.com/xpzouying/chatgptplugin/plugins/calculator"
 	"github.com/xpzouying/chatgptplugin/plugins/v2ex"
+	"github.com/xpzouying/gollm"
 )
 
 func TestManagerHandle_Calculator(t *testing.T) {
@@ -46,7 +46,7 @@ func TestManagerHandle_V2ex(t *testing.T) {
 func newChatGPTManager() *Manager {
 	_ = godotenv.Load() // ignore if file not exists
 
-	var llmer llm.LLMer
+	var llmer gollm.LLMer
 	{
 		token := os.Getenv("OPENAI_TOKEN")
 		if len(token) == 0 {

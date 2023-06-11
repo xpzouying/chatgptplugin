@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/xpzouying/chatgptplugin/llm"
+	"github.com/xpzouying/gollm"
 )
 
 var (
@@ -23,7 +23,7 @@ type PluginContext struct {
 }
 
 type Manager struct {
-	llmer llm.LLMer
+	llmer gollm.LLMer
 
 	// plugins <key:name, value:Plugin>
 	plugins map[string]Plugin
@@ -55,7 +55,7 @@ func WithPlugins(plugins []Plugin) ManagerOpt {
 }
 
 // NewManager create plugin manager.
-func NewManager(llmer llm.LLMer, opts ...ManagerOpt) *Manager {
+func NewManager(llmer gollm.LLMer, opts ...ManagerOpt) *Manager {
 
 	manager := &Manager{
 		llmer:   llmer,
@@ -174,13 +174,13 @@ func (m *Manager) makeTaskList() string {
 func (m *Manager) chatWithLlm(ctx context.Context, query string) (string, error) {
 	prompt := m.makePrompt(query)
 
-	messages := []llm.LlmMessage{
+	messages := []gollm.LlmMessage{
 		{
-			Role:    llm.RoleSystem,
+			Role:    gollm.RoleSystem,
 			Content: "You are an helpful and kind assistant to answer questions that can use tools to interact with real world and get access to the latest information.",
 		},
 		{
-			Role:    llm.RoleUser,
+			Role:    gollm.RoleUser,
 			Content: prompt,
 		},
 	}
