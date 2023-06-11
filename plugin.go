@@ -5,9 +5,6 @@ import "context"
 type Plugin interface {
 	Do(ctx context.Context, req map[string]any) (map[string]any, error)
 
-	// DecodeRequest decode json input string to plugin request
-	// DecodeRequest(input string) (req interface{}, err error)
-
 	GetName() string
 	GetInputExample() string
 	GetDesc() string
