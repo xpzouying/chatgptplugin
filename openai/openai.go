@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sashabaranov/go-openai"
-	"github.com/xpzouying/chatgptplugin/llm"
+	"github.com/xpzouying/gollm"
 )
 
 type ChatGPT struct {
@@ -39,9 +39,9 @@ func NewChatGPT(token string, opts ...Option) *ChatGPT {
 
 func (c ChatGPT) Summary(ctx context.Context, content string) (string, error) {
 
-	messages := []llm.LlmMessage{
+	messages := []gollm.LlmMessage{
 		{
-			Role:    llm.RoleUser,
+			Role:    gollm.RoleUser,
 			Content: content,
 		},
 	}
@@ -54,7 +54,7 @@ func (c ChatGPT) Summary(ctx context.Context, content string) (string, error) {
 	return answer.Content, nil
 }
 
-func (c ChatGPT) Chat(ctx context.Context, messages []llm.LlmMessage) (*llm.LlmAnswer, error) {
+func (c ChatGPT) Chat(ctx context.Context, messages []gollm.LlmMessage) (*gollm.LlmAnswer, error) {
 
 	chatGPTMessages := c.makeChatGPTMessage(messages)
 
@@ -62,7 +62,7 @@ func (c ChatGPT) Chat(ctx context.Context, messages []llm.LlmMessage) (*llm.LlmA
 
 }
 
-func (c ChatGPT) makeChatGPTMessage(messages []llm.LlmMessage) []openai.ChatCompletionMessage {
+func (c ChatGPT) makeChatGPTMessage(messages []gollm.LlmMessage) []openai.ChatCompletionMessage {
 
 	chatGPTMessages := make([]openai.ChatCompletionMessage, 0, len(messages))
 	for _, m := range messages {
@@ -75,7 +75,7 @@ func (c ChatGPT) makeChatGPTMessage(messages []llm.LlmMessage) []openai.ChatComp
 	return chatGPTMessages
 }
 
-func (c ChatGPT) send(ctx context.Context, messages []openai.ChatCompletionMessage) (*llm.LlmAnswer, error) {
+func (c ChatGPT) send(ctx context.Context, messages []openai.ChatCompletionMessage) (*gollm.LlmAnswer, error) {
 
 	resp, err := c.client.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
 		Model:    c.model,
@@ -93,11 +93,11 @@ func (c ChatGPT) send(ctx context.Context, messages []openai.ChatCompletionMessa
 	return answer, nil
 }
 
-func (c ChatGPT) convertLlmAnswer(openaiResp openai.ChatCompletionResponse) *llm.LlmAnswer {
+func (c ChatGPT) convertLlmAnswer(openaiResp openai.ChatCompletionResponse) *gollm.LlmAnswer {
 
 	choices := openaiResp.Choices[0]
 
-	return &llm.LlmAnswer{
+	return &gollm.LlmAnswer{
 		Role:    choices.Message.Role,
 		Content: choices.Message.Content,
 	}
