@@ -158,17 +158,29 @@ func (m *Manager) makeTaskList() string {
 
 	for _, p := range m.plugins {
 
+		name, desc, inputExample := m.getPluginArgs(p)
+
 		line := fmt.Sprintf(
 			`* %s: 该工具的作用是：%s, 请求参数示例为: %s`,
-			p.GetName(),
-			p.GetInputExample(),
-			p.GetDesc(),
+			name, desc, inputExample,
 		)
 
 		lines = append(lines, line)
 	}
 
 	return strings.Join(lines, "\n")
+}
+
+func (m *Manager) getPluginArgs(p Plugin) (name, desc, inputExample string) {
+
+	name = strings.ReplaceAll(p.GetName(), "\n", "")
+
+	desc = strings.ReplaceAll(p.GetDesc(), "\n", "")
+
+	inputExample = strings.ReplaceAll(p.GetInputExample(), "\n", "")
+	inputExample = strings.ReplaceAll(inputExample, "\t", "")
+
+	return
 }
 
 func (m *Manager) chatWithLlm(ctx context.Context, query string) (string, error) {
