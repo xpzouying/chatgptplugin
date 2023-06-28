@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -29,6 +28,8 @@ type Manager struct {
 
 	// plugins <key:name, value:Plugin>
 	plugins map[string]Plugin
+
+	printfFunc func(format string, v ...any)
 }
 
 type ManagerOpt func(manager *Manager)
@@ -56,12 +57,19 @@ func WithPlugins(plugins []Plugin) ManagerOpt {
 	}
 }
 
+func WithPrintfFunc(f PrintfFunc) ManagerOpt {
+	return func(manager *Manager) {
+		manager.printfFunc = f
+	}
+}
+
 // NewManager create plugin manager.
 func NewManager(llmer gollm.LLMer, opts ...ManagerOpt) *Manager {
 
 	manager := &Manager{
-		llmer:   llmer,
-		plugins: make(map[string]Plugin, 4),
+		llmer:      llmer,
+		plugins:    make(map[string]Plugin, 4),
+		printfFunc: DummyPrintf,
 	}
 
 	for _, opt := range opts {
@@ -87,7 +95,7 @@ func (m *Manager) Handle(ctx context.Context, query string) (map[string]any, err
 		return nil, err
 	}
 
-	log.Printf("got plugin answer: %v", answer)
+	m.printfFunc("got plugin answer: %v", answer)
 	return answer, nil
 }
 
@@ -99,7 +107,7 @@ func (m *Manager) Select(ctx context.Context, query string) (*PluginContext, err
 		return nil, err
 	}
 
-	log.Printf("chat with llm: query=%s answer=%s", query, answer)
+	m.printfFunc("chat with llm: query=%s answer=%s", query, answer)
 
 	return m.choicePlugins(answer)
 }
@@ -212,7 +220,7 @@ func (m *Manager) chatWithLlm(ctx context.Context, query string) (string, error)
 func (m *Manager) choicePlugins(answer string) (*PluginContext, error) {
 	answer = cleanupString(answer) // 移除 markdown的一些特殊字符
 
-	log.Printf("after cleanup answer: %s", answer)
+	m.printfFunc("after cleanup answer: %s", answer)
 
 	var pluginAnswer struct {
 		Plugin string         `json:"plugin,omitempty"`
