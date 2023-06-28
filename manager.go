@@ -18,6 +18,8 @@ var (
 type PluginContext struct {
 	Plugin
 
+	GPTAnswer string // save llm answer
+
 	// Request for handle function of plugin.
 	Request map[string]any
 }
@@ -96,6 +98,8 @@ func (m *Manager) Select(ctx context.Context, query string) (*PluginContext, err
 	if err != nil {
 		return nil, err
 	}
+
+	log.Printf("chat with llm: query=%s answer=%s", query, answer)
 
 	return m.choicePlugins(answer)
 }
@@ -207,6 +211,8 @@ func (m *Manager) chatWithLlm(ctx context.Context, query string) (string, error)
 
 func (m *Manager) choicePlugins(answer string) (*PluginContext, error) {
 	answer = cleanupString(answer) // 移除 markdown的一些特殊字符
+
+	log.Printf("after cleanup answer: %s", answer)
 
 	var pluginAnswer struct {
 		Plugin string         `json:"plugin,omitempty"`
