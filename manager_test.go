@@ -57,3 +57,36 @@ func newChatGPTManager() *Manager {
 
 	return NewManager(llmer)
 }
+
+func TestManager_cleanupString(t *testing.T) {
+
+	t.Run("clean with markdown", func(t *testing.T) {
+
+		s := `'''
+{
+  "plugin": "Google",
+  "args": {
+    "query": "先有鸡还是先有蛋"
+  }
+}
+'''`
+
+		got := cleanupString(s)
+
+		t.Logf("got: %s", got)
+	})
+
+	t.Run("clean with markdown", func(t *testing.T) {
+
+		s := `{
+  "plugin": "Google",
+  "args": {
+    "query": "先有鸡还是先有蛋"
+  }
+}`
+
+		got := cleanupString(s)
+
+		t.Logf("got: %s", got)
+	})
+}

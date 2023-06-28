@@ -206,6 +206,7 @@ func (m *Manager) chatWithLlm(ctx context.Context, query string) (string, error)
 }
 
 func (m *Manager) choicePlugins(answer string) (*PluginContext, error) {
+	answer = cleanupString(answer) // 移除 markdown的一些特殊字符
 
 	var pluginAnswer struct {
 		Plugin string         `json:"plugin,omitempty"`
@@ -235,4 +236,11 @@ func (m *Manager) choicePlugins(answer string) (*PluginContext, error) {
 	}
 
 	return nil, ErrNoValidPlugin
+}
+
+func cleanupString(s string) string {
+
+	s = strings.ReplaceAll(s, "\n", "")
+	s = strings.ReplaceAll(s, "'''", "")
+	return s
 }
